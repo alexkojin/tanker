@@ -112,7 +112,8 @@ module Tanker
 
       search_on_fields = models.map{|model| model.tanker_config.indexes.map{|arr| arr[0]}.uniq}.flatten.uniq.join(":(#{query.to_s}) OR ")
 
-      query = "(#{search_on_fields}:(#{query.to_s}) OR __any:(#{query.to_s})) __type:(#{models.map(&:name).map {|name| "\"#{name.split('::').join(' ')}\"" }.join(' OR ')})"
+      # query = "(#{search_on_fields}:(#{query.to_s}) OR __any:(#{query.to_s})) __type:(#{models.map(&:name).map {|name| "\"#{name.split('::').join(' ')}\"" }.join(' OR ')})"
+      query = "(#{query.to_s}) __type:(#{models.map(&:name).map {|name| "\"#{name.split('::').join(' ')}\"" }.join(' OR ')})"
       options = { :start => paginate[:per_page] * (paginate[:page] - 1), :len => paginate[:per_page] }.merge(options) if paginate
       results = index.search(query, options)
       SearchState.new(results, fetch, snippets, paginate)
@@ -433,7 +434,7 @@ module Tanker
         data[field.to_sym] = val.to_s unless val.nil?
       end
 
-      data[:__any] = data.values.sort_by{|v| v.to_s}.join " . "
+      # data[:__any] = data.values.sort_by{|v| v.to_s}.join " . "
       data[:__type] = type_name
       data[:__id] = self.id.is_a?(Fixnum) ? self.id : self.id.to_s
 
