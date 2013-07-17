@@ -316,6 +316,15 @@ module Tanker
       puts "Indexed #{record_size} #{self} records in #{Time.now - timer} seconds"
     end
 
+    # add functions to index. Call it once or when new functions changed.
+    def add_functions
+      index = Tanker.api.get_index(self.tanker_config.index_name)
+      self.tanker_config.functions.each do |idx, definition|
+        index.add_function(idx, definition)
+        puts "Index #{self.tanker_config.index_name.inspect} function: #{idx} => #{definition.inspect}"
+      end
+    end
+
     def tanker_parse_doc_id(result)
       result['docid'].split(' ').last
     end
